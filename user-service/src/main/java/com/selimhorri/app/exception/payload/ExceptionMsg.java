@@ -3,7 +3,7 @@ package com.selimhorri.app.exception.payload;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-import org.springframework.http.HttpStatus;
+
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;

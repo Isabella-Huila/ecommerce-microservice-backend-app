@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(final Integer userId, final UserDto userDto) {
         log.info("✏️ Actualizando usuario con ID proporcionado: {}", userId);
-        UserDto existing = this.findById(userId); // si no existe, lanza excepción 404
+        UserDto existing = this.findById(userId);
         userDto.setUserId(existing.getUserId());
         return UserMappingHelper.map(
                 this.userRepository.save(UserMappingHelper.map(userDto))
@@ -91,17 +91,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findByUsername(final String username) {
         log.info("🔍 Buscando usuario con nombre de usuario: {}", username);
-        return UserMappingHelper.map(
-                this.userRepository.findByCredentialUsername(username)
-                        .orElseThrow(() ->
-                            new UserObjectNotFoundException(
-                                String.format("No se encontró ningún usuario con el nombre de usuario '%s'.", username)
-                            )
-                        )
-        );
+        
+        // Manejo de errores mejorado
+        try {
+            return this.userRepository.findByCredentialUsername(username)
+                    .map(user -> {
+                        log.info("✅ Usuario encontrado: {} (ID: {})", username, user.getUserId());
+                        return UserMappingHelper.map(user);
+                    })
+                    .orElseThrow(() -> {
+                        log.warn("⚠️ No existe usuario con username: {}", username);
+                        return new UserObjectNotFoundException(
+                            String.format("No se encontró ningún usuario con el nombre de usuario '%s'.", username)
+                        );
+                    });
+        } catch (UserObjectNotFoundException e) {
+            // Re-lanzar excepciones de negocio
+            throw e;
+        } catch (Exception e) {
+            // Capturar cualquier otro error inesperado
+            log.error("💥 Error inesperado al buscar usuario por username '{}': {}", username, e.getMessage(), e);
+            throw new RuntimeException(
+                String.format("Error al buscar el usuario con username '%s': %s", username, e.getMessage()), 
+                e
+            );
+        }
     }
 }
-
-
-
-
