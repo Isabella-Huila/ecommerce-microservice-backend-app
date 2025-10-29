@@ -53,6 +53,11 @@ public final class Favourite extends AbstractMappedEntity implements Serializabl
 	@JsonFormat(pattern = AppConstant.LOCAL_DATE_TIME_FORMAT, shape = Shape.STRING)
 	@DateTimeFormat(pattern = AppConstant.LOCAL_DATE_TIME_FORMAT)
 	private LocalDateTime likeDate;
+
+    public void setFavouriteId(FavouriteId favouriteId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setFavouriteId'");
+    }
 	
 }
 
